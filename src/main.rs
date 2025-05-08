@@ -1,0 +1,34 @@
+use curl::easy::Easy;
+use std::str;
+
+fn speed_test() -> String {
+    println!("....speed test");
+    let url = "https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=https://www.myridia.com&category=performance";
+    let mut data: Vec<u8> = Vec::new();
+    let mut handle = Easy::new();
+    handle.ssl_verify_peer(false);
+    handle.url(url).unwrap();
+    {
+        let mut transfer = handle.transfer();
+        transfer
+            .write_function(|new_data| {
+                data.extend_from_slice(new_data);
+                Ok(new_data.len())
+            })
+            .unwrap();
+        transfer.perform().unwrap();
+    }
+    let s = str::from_utf8(&data).unwrap();
+    //println!("...String Result: {:?}", s);
+    let o = json::parse(s).unwrap();
+    //println!("...Parsed Object: {:?}", o);
+    let result = &o["lighthouseResult"]["categories"]["performance"]["score"];
+
+    return result.to_string();
+}
+
+fn main() {
+    println!("....main");
+    let r = speed_test();
+    println!("Performance: {}", r);
+}

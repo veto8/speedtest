@@ -1,0 +1,8 @@
+[package]
+name = "speedtest"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+curl = {"version"= "0.4.44"}
+json = {"version"= "0.12.4"}
